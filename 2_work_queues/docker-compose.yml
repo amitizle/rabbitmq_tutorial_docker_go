@@ -1,0 +1,26 @@
+version: '3.2'
+services:
+  rabbitmq:
+    environment:
+      RABBITMQ_ERLANG_COOKIE: IAMACOOKIE
+      RABBITMQ_DEFAULT_VHOST: /
+    image: rabbitmq:3.6-management-alpine
+    ports:
+      - 15672:15672
+      - 5672:5672
+  worker:
+    build: ./client
+    depends_on:
+    - rabbitmq
+    command:
+      - '/go/bin/client'
+      - '-role=worker'
+  task_enqueuer:
+    build: ./client
+    depends_on:
+    - rabbitmq
+    command:
+      - '/go/bin/client'
+      - '-role=task_enqueuer'
+volumes:
+  go-service:
